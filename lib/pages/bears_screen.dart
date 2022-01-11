@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:navigator_two_point_oh/app_state.dart';
 import 'package:navigator_two_point_oh/models/models.dart';
+import 'package:provider/provider.dart';
 
 class BearsScreen extends StatefulWidget {
-  final AppState appState;
-  const BearsScreen({Key? key, required this.appState}) : super(key: key);
+  const BearsScreen({Key? key}) : super(key: key);
 
   @override
   _BearsScreenState createState() => _BearsScreenState();
@@ -13,6 +13,7 @@ class BearsScreen extends StatefulWidget {
 class _BearsScreenState extends State<BearsScreen> {
   @override
   Widget build(BuildContext context) {
+    final appState = Provider.of<AppState>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Bears'),
@@ -21,7 +22,7 @@ class _BearsScreenState extends State<BearsScreen> {
         itemBuilder: (context, index) => ListTile(
           title: Text(Bear.bears[index].name),
           onTap: () {
-            widget.appState.selectedBear = Bear.bears[index];
+            appState.selectedBear = Bear.bears[index];
           },
         ),
         itemCount: Bear.bears.length,

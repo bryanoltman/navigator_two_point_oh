@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:navigator_two_point_oh/app_state.dart';
 import 'package:navigator_two_point_oh/models/models.dart';
 
 class LionsScreen extends StatefulWidget {
-  final AppState appState;
-  const LionsScreen({Key? key, required this.appState}) : super(key: key);
+  const LionsScreen({Key? key}) : super(key: key);
 
   @override
   _LionsScreenState createState() => _LionsScreenState();

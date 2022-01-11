@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:navigator_two_point_oh/app_state.dart';
-import 'package:navigator_two_point_oh/pages/animals_router_delegate.dart';
+import 'package:navigator_two_point_oh/pages/bear_screen.dart';
+import 'package:navigator_two_point_oh/pages/bears_screen.dart';
+import 'package:navigator_two_point_oh/pages/lions_screen.dart';
+import 'package:navigator_two_point_oh/pages/tiger_screen.dart';
+import 'package:navigator_two_point_oh/pages/tigers_screen.dart';
 
 enum HomeScreenTab { lions, tigers, bears }
 
@@ -16,41 +20,62 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late AnimalsRouterDelegate _animalsRouterDelegate;
-  ChildBackButtonDispatcher? _backButtonDispatcher;
+  final tabsToNavKeys = {
+    HomeScreenTab.lions: GlobalKey<NavigatorState>(),
+    HomeScreenTab.tigers: GlobalKey<NavigatorState>(),
+    HomeScreenTab.bears: GlobalKey<NavigatorState>(),
+  };
 
-  @override
-  void initState() {
-    super.initState();
-    _animalsRouterDelegate = AnimalsRouterDelegate(widget.appState);
+  Widget _screenForTab(HomeScreenTab tab, AppState appState) {
+    switch (tab) {
+      case HomeScreenTab.lions:
+        return LionsScreen();
+      case HomeScreenTab.tigers:
+        return TigersScreen();
+      case HomeScreenTab.bears:
+        return BearsScreen();
+    }
   }
 
-  @override
-  void didUpdateWidget(covariant HomeScreen oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _animalsRouterDelegate.appState = widget.appState;
+  Widget? _detailScreen(AppState appState) {
+    switch (appState.currentTab) {
+      case HomeScreenTab.lions:
+        return null;
+      case HomeScreenTab.tigers:
+        if (appState.selectedTiger != null) {
+          return TigerScreen(tiger: appState.selectedTiger!);
+        }
+
+        return null;
+      case HomeScreenTab.bears:
+        if (appState.selectedBear != null) {
+          return BearScreen(bear: appState.selectedBear!);
+        }
+
+        return null;
+    }
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // Defer back button dispatching to the child router
-    _backButtonDispatcher = Router.of(context)
-        .backButtonDispatcher
-        ?.createChildBackButtonDispatcher();
+  Widget _navigatorForAppState(AppState appState) {
+    final navigatorKey = tabsToNavKeys[appState.currentTab]!;
+    final detailsScreen = _detailScreen(appState);
+
+    return Navigator(
+      key: navigatorKey,
+      pages: [
+        MaterialPage(
+          child: _screenForTab(appState.currentTab, appState),
+        ),
+        if (detailsScreen != null) MaterialPage(child: detailsScreen)
+      ],
+      onPopPage: (route, result) => route.didPop(result),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    // Claim priority, If there are parallel sub router, you will need
-    // to pick which one should take priority;
-    _backButtonDispatcher?.takePriority();
-
     return Scaffold(
-      body: Router(
-        routerDelegate: _animalsRouterDelegate,
-        backButtonDispatcher: _backButtonDispatcher,
-      ),
+      body: _navigatorForAppState(widget.appState),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: widget.appState.currentTab.index,
         onTap: (index) =>

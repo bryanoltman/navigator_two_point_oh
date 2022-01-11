@@ -3,6 +3,13 @@ import 'package:navigator_two_point_oh/home_screen.dart';
 import 'package:navigator_two_point_oh/models/models.dart';
 
 class AppState with ChangeNotifier {
+  bool _isHome = false;
+  bool get isHome => _isHome;
+  set isHome(bool newValue) {
+    _isHome = newValue;
+    notifyListeners();
+  }
+
   HomeScreenTab _currentTab;
   HomeScreenTab get currentTab => _currentTab;
   set currentTab(HomeScreenTab newTab) {
